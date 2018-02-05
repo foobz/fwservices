@@ -1,0 +1,38 @@
+#!/usr/bin/env ansible-playbook
+---
+
+############################################################
+# Play 1 - Configure Firewall Rules
+#############################################################
+- name: Deploying F5 VNF Firewall Rules
+  hosts: localhost
+  gather_facts: no
+  vars:
+    bigipurl: __target_ip__
+    F5_USER: "admin"
+    F5_PASSWORD: "fbchan123"
+  connection: local
+
+  tasks:
+    - name: Permit incoming ICMP traffic
+      uri:
+        url: https://{{ bigipurl }}/mgmt/tm/security/firewall/policy/~Common~Global_FW_Policy/rules
+        header: "application/json"
+        method: POST
+        user: "{{ F5_USER }}"
+        password: "{{ F5_PASSWORD }}"
+        force_basic_auth: yes
+        validate_certs: no
+        body: "{{ {\"name\":\"permit_icmp\",\"action\":\"accept\",\"status\":\"enabled\",\"place-after\":\"last\",\"source\":{},\"destination\":{\"addresses\":[{\"name\":\"__dest_ip__\"}]},\"ipProtocol\":\"icmp\",\"log\":\"yes\",\"description\":\"Permit incoming ICMP\"} }}"
+        body_format: json
+    - name: Permit iPERF Port 5001 to Internal Network
+      uri:
+        url: https://{{ bigipurl }}/mgmt/tm/security/firewall/policy/~Common~Global_FW_Policy/rules
+        header: "application/json"
+        method: POST
+        user: "{{ F5_USER }}"
+        password: "{{ F5_PASSWORD }}"
+        force_basic_auth: yes
+        validate_certs: no
+        body: "{{ {\"name\":\"permit_iperf\",\"action\":\"accept\",\"status\":\"enabled\",\"place-after\":\"last\",\"source\":{},\"destination\":{\"addresses\":[{\"name\":\"__dest_ip__\"}],\"ports\":[{\"name\":\"5001\"}]},\"ipProtocol\":\"tcp\",\"log\":\"yes\",\"description\":\"Permit incoming iPerf traffic\"} }}"
+        body_format: json
