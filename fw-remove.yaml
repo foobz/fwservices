@@ -1,0 +1,26 @@
+#!/usr/bin/env ansible-playbook
+---
+
+############################################################
+# Play 1 - Configure Firewall Rules
+#############################################################
+- name: Decomm F5 VNF Firewall Rules
+  hosts: localhost
+  gather_facts: no
+  vars:
+    bigipurl: "{{target_ip}}"
+    F5_USER: "admin"
+    F5_PASSWORD: "fbchan123"
+    rulename: "{{ rule_name }}"
+  connection: local
+
+  tasks:
+    - name: Allow ICMP to Internal Network
+      uri:
+        url: https://{{ bigipurl }}/mgmt/tm/security/firewall/policy/~Common~Global_FW_Policy/rules/{{ rulename }}
+        header: "application/json"
+        method: DELETE
+        user: "{{ F5_USER }}"
+        password: "{{ F5_PASSWORD }}"
+        force_basic_auth: yes
+        validate_certs: no

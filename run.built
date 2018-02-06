@@ -1,5 +1,12 @@
 #!/bin/bash
 unset -v line1 line2 line3
 { IFS= read -r line1 && IFS= read -r line2 && IFS= read -r line3; } < rule
+
 # built ansible-playbook
-cat _fw-add.yaml | sed 's/__target_ip__/10.0.125.78/g' | sed 's/__dest_ip__/10.0.110.10/g' > ansible-run.yaml
+if [[ "$line1" == "ADD" ]]; then
+ cat _fw-add.yaml | sed "s/__target_ip__/$line2/g" | sed "s/__dest_ip__/$line3/g" > ansible-run.yaml
+else
+if [[ "$line1" == "REMOVE" ]]; then
+ cat _fw-remove.yaml | sed "s/__target_ip__/$line2/g" | sed "s/__rule_name__/$line3/g" > ansible-run.yaml
+fi
+fi 
