@@ -1,6 +1,6 @@
-REMOVE
-10.0.125.86
-permit_icmp
+ADD
+10.0.125.87
+10.0.100.10
 
 # Line1: Action ADD or REMOVE
 # Line2: Target IP. FW Management IP
